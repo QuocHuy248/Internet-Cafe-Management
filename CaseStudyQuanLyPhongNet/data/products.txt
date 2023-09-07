@@ -1,6 +1,6 @@
-1,Sting,Sting description,15000,DRINK,16
+1,Sting,Sting description,15000,DRINK,14
 2,Coca,Coca description,15000,DRINK,20
 3,Aquafina,Aquafina description,10000,DRINK,20
-4,Cơm chiên trứng,Cơm chiên trứng description,25000,FOOD,20
+4,Cơm chiên trứng,Cơm chiên trứng description,25000,FOOD,14
 5,Mỳ tôm,Mỳ tôm description,25000,FOOD,0
-6,Cơm gà,Cơm gà description,25000,FOOD,15
+6,Cơm gà,Cơm gà description,25000,FOOD,13

@@ -100,9 +100,10 @@ public class ComputerService implements IComputerService {
     @Override
     public void updateComputerName(String name, String newname) {
         List<Computer> computers = getAllComputer();
-        Computer computer1 = computers.stream().filter(computer -> computer.getName().equals(name)).findFirst().get();
-        computer1.setName(newname);
-        computer1.setUsername(newname);
+         computers.stream().filter(computer -> computer.getName().equals(name)).findFirst().get().setName(newname);
+         computers.stream().filter(computer -> computer.getName().equals(name)).findFirst().get().setUsername(newname);
+         FileUtils.writeData(fileComputer,computers);
+
     }
 
     @Override

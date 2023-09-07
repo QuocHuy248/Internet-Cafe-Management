@@ -4,11 +4,13 @@ import org.example.Service.ComputerService;
 import org.example.Service.IComputerService;
 import org.example.Service.IUserService;
 import org.example.Service.UserService;
+import org.example.Utils.AuthUtils;
 import org.example.Utils.TimeUtils;
 import org.example.Utils.ValidateUtils;
 import org.example.Views.AdminView;
 import org.example.Views.EmployeeView;
 import org.example.model.Computer;
+import org.example.model.ERole;
 import org.example.model.EStatusComputer;
 import org.example.model.User;
 
@@ -36,13 +38,13 @@ public class ComputerControl {
         System.out.println("║           Menu quản lý máy trạm.               ║");
         System.out.println("║                                                ║");
         System.out.println("║     0.Trở về.                                  ║");
-        System.out.println("║     1.Hiển thị máy theo trạng thái hoạt .      ║");
+        System.out.println("║     1.Hiển thị máy theo trạng thái.            ║");
         System.out.println("║     2.Thêm máy.                                ║");
-        System.out.println("║     3.Cập nhật trạng thái máy.                 ║");
+        System.out.println("║     3.Cập nhật tên/trạng thái máy.             ║");
         System.out.println("║     4.Xóa máy.                                 ║");
         System.out.println("║                                                ║");
         System.out.println("╚════════════════════════════════════════════════╝");
-        int action = ValidateUtils.getIntOfWithBounds(0,4);
+        int action = ValidateUtils.getIntOfWithBounds(0, 4);
         switch (action) {
             case 0:
                 AdminView adminView = new AdminView();
@@ -73,33 +75,33 @@ public class ComputerControl {
         System.out.println("║           Menu quản lý máy trạm.               ║");
         System.out.println("║                                                ║");
         System.out.println("║     0.Trở về.                                  ║");
-        System.out.println("║     1.Hiển thị máy theo trạng thái hoạt .      ║");
+        System.out.println("║     1.Hiển thị máy theo trạng thái.            ║");
         System.out.println("║     2.Thêm máy.                                ║");
-        System.out.println("║     3.Cập nhật trạng thái máy.                 ║");
+        System.out.println("║     3.Cập nhật tên/trạng thái máy.             ║");
         System.out.println("║     4.Xóa máy.                                 ║");
         System.out.println("║                                                ║");
         System.out.println("╚════════════════════════════════════════════════╝");
-        int action = ValidateUtils.getIntOfWithBounds(0,4);
+        int action = ValidateUtils.getIntOfWithBounds(0, 4);
         switch (action) {
             case 0:
-                EmployeeView employeeView= new EmployeeView();
+                EmployeeView employeeView = new EmployeeView();
                 employeeView.employeeLauncher();
                 break;
             case 1:
                 showComputerByStatus();
-                computerControlView();
+                computerControlViewByEmployee();
                 break;
             case 2:
                 addComputer();
-                computerControlView();
+                computerControlViewByEmployee();
                 break;
             case 3:
                 upDateComputer();
-                computerControlView();
+                computerControlViewByEmployee();
                 break;
             case 4:
                 deleteComputer();
-                computerControlView();
+                computerControlViewByEmployee();
                 break;
         }
     }
@@ -110,7 +112,7 @@ public class ComputerControl {
                         ValidateUtils.FIELD_COMPUTER_MESSAGE,
                         ValidateUtils.REGEX_COMPUTER);
         List<Computer> computers = icomputerService.getAllComputer();
-        icomputerService.deleteComputer(computers.stream().filter(computer -> computer.getName() == name).findFirst().get().getId());
+        icomputerService.deleteComputer(computers.stream().filter(computer -> computer.getName().equals(name)).findFirst().get().getId());
         showComputer();
     }
 
@@ -120,14 +122,18 @@ public class ComputerControl {
         System.out.println("║                                                ║");
         System.out.println("║     0.Trở về.                                  ║");
         System.out.println("║     1.Cập nhật tên máy .                       ║");
-        System.out.println("║     2.Cập nhật trạng thái của máy              ║");
+        System.out.println("║     2.Cập nhật trạng thái của máy.             ║");
         System.out.println("║                                                ║");
         System.out.println("╚════════════════════════════════════════════════╝");
 
-        int action = ValidateUtils.getIntOfWithBounds(0,2);
+        int action = ValidateUtils.getIntOfWithBounds(0, 2);
         switch (action) {
             case 0:
-                computerControlView();
+                if (AuthUtils.getUser().getRole().equals(ERole.ADMIN)) {
+                    computerControlView();
+                } else if (AuthUtils.getUser().getRole().equals(ERole.EMPLOYEE)) {
+                    computerControlViewByEmployee();
+                }
                 break;
             case 1:
                 updateComputerName();
@@ -154,8 +160,8 @@ public class ComputerControl {
         System.out.println("║            3. Sẵn sàng.                        ║");
         System.out.println("║                                                ║");
         System.out.println("╚════════════════════════════════════════════════╝");
-        int idStatus= ValidateUtils.getIntOfWithBounds(1,3);
-        icomputerService.updateComputerStatus(nameComputer,idStatus);
+        int idStatus = ValidateUtils.getIntOfWithBounds(1, 3);
+        icomputerService.updateComputerStatus(nameComputer, idStatus);
     }
 
     private void updateComputerName() {
@@ -176,7 +182,7 @@ public class ComputerControl {
                 ValidateUtils.FIELD_COMPUTER_MESSAGE,
                 ValidateUtils.REGEX_COMPUTER);
 
-        Computer computer = new Computer(System.currentTimeMillis() % 100000, name, EStatusComputer.Ready, name, TimeUtils.parseTime("00:00:00"));
+        Computer computer = new Computer(System.currentTimeMillis() % 100000, name, EStatusComputer.Ready, name, TimeUtils.parseTime("00:00"));
         icomputerService.createComputer(computer);
         showComputer();
     }
@@ -191,12 +197,16 @@ public class ComputerControl {
         System.out.println("║        3. Hiển thị máy chưa có người sử dụng.  ║");
         System.out.println("║                                                ║");
         System.out.println("╚════════════════════════════════════════════════╝");
-        int action = ValidateUtils.getIntOfWithBounds(0,3);
+        int action = ValidateUtils.getIntOfWithBounds(0, 3);
         List<Computer> computers = icomputerService.getAllComputer();
 
         switch (action) {
             case 0:
-                computerControlView();
+                if (AuthUtils.getUser().getRole().equals(ERole.ADMIN)) {
+                    computerControlView();
+                } else if (AuthUtils.getUser().getRole().equals(ERole.EMPLOYEE)) {
+                    computerControlViewByEmployee();
+                }
                 break;
             case 1:
                 showAllComputerByStatus(computers, EStatusComputer.UnderMaintenance);
@@ -230,7 +240,8 @@ public class ComputerControl {
             System.out.printf("║%5s ║ %15s ║ %20s ║ %15s ║ %-10s ║\n", computer.getId(), computer.getName()
                     , computer.getStatusComputer()
                     , computer.getUsername(), computer.getStartUsing());
-        }        System.out.printf("╚══════════════════════════════════════════════════════════════════════════════╝\n");
+        }
+        System.out.printf("╚══════════════════════════════════════════════════════════════════════════════╝\n");
 
     }
 
@@ -245,18 +256,17 @@ public class ComputerControl {
             System.out.printf("║%5s ║ %15s ║ %20s ║ %15s ║ %-10s ║\n", computer.getId(), computer.getName()
                     , computer.getStatusComputer()
                     , computer.getUsername(), computer.getStartUsing());
-        }        System.out.printf("╚══════════════════════════════════════════════════════════════════════════════╝\n");
+        }
+        System.out.printf("╚══════════════════════════════════════════════════════════════════════════════╝\n");
     }
 
     ;
 
 
-
-
-    public List<Computer>  updateBalance() {
+    public List<Computer> updateBalance() {
         LocalTime time = LocalTime.now();
         String timeNow = TimeUtils.formatTime(time);
-        LocalTime timeResult=TimeUtils.parseTime(timeNow);
+        LocalTime timeResult = TimeUtils.parseTime(timeNow);
         List<User> users = iUserService.getAllUsers();
         List<Computer> computers = icomputerService.getAllComputer();
         List<Computer> computerUsing = computers.stream().filter(computer -> computer
@@ -266,9 +276,9 @@ public class ComputerControl {
         for (int i = 0; i < users.size(); i++) {
             for (int j = 0; j < computerUsing.size(); j++) {
                 if (users.get(i).getUsername().equals(computerUsing.get(j).getUsername())) {
-                    users.get(i).setBalance(calculateBalance(computerUsing.get(j).getStartUsing(),timeResult,
+                    users.get(i).setBalance(calculateBalance(computerUsing.get(j).getStartUsing(), timeResult,
                             users.get(i).getBalance()));
-                    iUserService.updateBalance(users.get(i).getBalance(),users.get(i));
+                    iUserService.updateBalance(users.get(i).getBalance(), users.get(i));
                     if (users.get(i).getBalance() == 0) {
                         computerUsing.get(j).setStatusComputer(EStatusComputer.Ready);
                         computerUsing.get(j).setStartUsing(TimeUtils.parseTime("00:00"));
@@ -285,12 +295,13 @@ public class ComputerControl {
     private long calculateBalance(LocalTime startime, LocalTime now, long balance) {
         long pricePerMinute = Computer.getPrice() / 60;
         Duration duration = Duration.between(startime, now);
-        long minute =  duration.toMinutes();
+        long minute = duration.toMinutes();
         long resultbalance = balance - pricePerMinute * minute;
         if (resultbalance < 0) {
-            return 0 ;
+            return 0;
         } else return resultbalance;
     }
+
     private String checkInputValid(String fieldName, String fieldMessage, String fieldPattern) {
         String input = null;
         boolean validateInput = false;
@@ -298,14 +309,23 @@ public class ComputerControl {
             List<Computer> computers = icomputerService.getAllComputer();
             System.out.printf("Nhập %s: \n", fieldName);
             input = scanner.nextLine();
-            if (!ValidateUtils.isValid(fieldPattern, input)) {
-                System.out.println(fieldMessage);
-                validateInput = true;
-            } else if (ValidateUtils.isValid(fieldPattern, input) && !checkComputer(input)) {
-                System.out.println("Không tìm thấy máy, vui lòng nhập lại tên máy");
-                validateInput=true;
+            if (!input.isEmpty()) {
+                if (!ValidateUtils.isValid(fieldPattern, input)) {
+                    System.out.println(fieldMessage);
+                    validateInput = true;
+                } else if (ValidateUtils.isValid(fieldPattern, input) && !checkComputer(input)) {
+                    System.out.println("Không tìm thấy máy, vui lòng nhập lại tên máy");
+                    validateInput = true;
+                } else {
+                    validateInput = false;
+                }
             } else {
-                validateInput = false;
+                if (AuthUtils.getUser().getRole().equals(ERole.ADMIN)) {
+                    computerControlView();
+                }
+                if (AuthUtils.getUser().getRole().equals(ERole.EMPLOYEE)) {
+                    computerControlViewByEmployee();
+                }
             }
 
         } while (validateInput);
@@ -321,6 +341,7 @@ public class ComputerControl {
         }
         return false;
     }
+
     private String checkInputValidNewComputer(String fieldName, String fieldMessage, String fieldPattern) {
         String input = null;
         boolean validateInput = false;
@@ -333,7 +354,7 @@ public class ComputerControl {
                 validateInput = true;
             } else if (ValidateUtils.isValid(fieldPattern, input) && checkComputer(input)) {
                 System.out.println("Tên máy đã tồn tại, vui lòng nhập lại");
-                validateInput=true;
+                validateInput = true;
             } else {
                 validateInput = false;
             }
@@ -343,7 +364,7 @@ public class ComputerControl {
     }
 
     public static void main(String[] args) {
-        ComputerControl computerControl= new ComputerControl();
+        ComputerControl computerControl = new ComputerControl();
         computerControl.showComputer();
     }
 }

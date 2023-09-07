@@ -324,7 +324,7 @@ public class GuestControl {
 
     }
 
-    private Comparator<? super User> sortGuestDecreasing(Comparator<User> comparator) {
+    private Comparator<User> sortGuestDecreasing(Comparator<User> comparator) {
         System.out.println("╔═════════════════════════════════════════════╗");
         System.out.println("║              Bạn muốn sắp xếp theo:         ║");
         System.out.println("║                                             ║");
@@ -365,7 +365,7 @@ public class GuestControl {
 
     }
 
-    private Comparator<? super User> sortGuestDescending(Comparator<User> comparator) {
+    private Comparator<User> sortGuestDescending(Comparator<User> comparator) {
         System.out.println("╔═════════════════════════════════════════════╗");
         System.out.println("║              Bạn muốn sắp xếp theo:         ║");
         System.out.println("║                                             ║");

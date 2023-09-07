@@ -245,21 +245,23 @@ public class OrderControl {
         order.setTotalPrice();
         order.setCreateAt(LocalDate.now());
         order.setUsername(user.getUsername());
-        System.out.printf("╔════════════════════════════════════════════════════════════╗\n");
+        System.out.printf("╔═════════════════════════════════════════════════════════════════════════════╗\n");
 
-        System.out.printf("║15%s ║ 15%s ║ 15%s ║ 15%s ║ 15%s║\n", "ID Product", " Name Product", "Quantity", " Price of Product", "Price");
+        System.out.printf("║%10s ║ %15s ║ %10s ║ %16s ║ %13s ║\n", "ID Product", "Name Product", "Quantity", "Price of Product", "Price");
         List<OrderItem> orderItems = order.getOrderItems();
-        System.out.printf("║════════════════════════════════════════════════════════════║\n");
+        System.out.printf("║═════════════════════════════════════════════════════════════════════════════║\n");
 
         for (OrderItem o : orderItems) {
-            System.out.printf("║15%s ║ 15%s ║ 15%s ║ 15%s ║ 15%s║\n",
-                    o.getId(), iProductService.getProductNameByIdProduct(o.getIdProduct()),
+            System.out.printf("║%10s ║ %15s ║ %10s ║ %16s ║ %13s ║\n",
+                    o.getIdProduct(), iProductService.getProductNameByIdProduct(o.getIdProduct()),
                     o.getQuantity(), o.getPrice(), o.getQuantity() * o.getPrice());
 
         }
-        System.out.printf(" ║69%s ║ 15%s\n",
+        System.out.printf("║═════════════════════════════════════════════════════════════════════════════║\n");
+
+        System.out.printf("║%60s ║ %13s ║\n",
                 "Total Price", order.getTotal());
-        System.out.printf("╚════════════════════════════════════════════════════════════╝\n");
+        System.out.printf("╚═════════════════════════════════════════════════════════════════════════════╝\n");
 
         System.out.println("╔═════════════════════════════════════════════╗");
         System.out.println("║           Bạn có muốn thanh toán không.     ║");
