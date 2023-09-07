@@ -2,6 +2,7 @@ package org.example.Control;
 
 import org.example.Service.IProductService;
 import org.example.Service.ProductService;
+import org.example.Utils.AuthUtils;
 import org.example.Utils.DateUtils;
 import org.example.Utils.ValidateUtils;
 import org.example.Views.AdminView;
@@ -122,7 +123,7 @@ public class ProductControl {
 
     private void updateProduct() {
         showProduct();
-        long id = Long.parseLong(checkInputIDProductValidExist(ValidateUtils.FIELD_IDPRODUCT,ValidateUtils.FIELD_IDPRODUCT_MESSAGE,ValidateUtils.REGEX_IDPRODUCT));
+        long id = Long.parseLong(checkInputIDProductValidExist(ValidateUtils.FIELD_IDPRODUCT, ValidateUtils.FIELD_IDPRODUCT_MESSAGE, ValidateUtils.REGEX_IDPRODUCT));
         String name = checkInputProductNameValid(ValidateUtils.FIELD_PRODUCTNAME, ValidateUtils.FIELD_PRODUCTNAME_MESSAGE, ValidateUtils.REGEX_PRODUCTNAME);
         String productDes = checkInputValid(ValidateUtils.FIELD_PRODUCTDES, ValidateUtils.FIELD_PRODUCTDES_MESSAGE, ValidateUtils.REGEX_PRODUCTNAME);
         long price = Long.parseLong(checkInputValid(ValidateUtils.FIELD_PRODUCTPRICE, ValidateUtils.FIELD_PRODUCTPRICE_MESSAGE, ValidateUtils.REGEX_PRODUCTPRICE));
@@ -142,7 +143,7 @@ public class ProductControl {
 
     private void deleteProduct() {
         showProduct();
-        long id = Long.parseLong(checkInputIDProductValidExist(ValidateUtils.FIELD_IDPRODUCT,ValidateUtils.FIELD_IDPRODUCT_MESSAGE,ValidateUtils.REGEX_IDPRODUCT));
+        long id = Long.parseLong(checkInputIDProductValidExist(ValidateUtils.FIELD_IDPRODUCT, ValidateUtils.FIELD_IDPRODUCT_MESSAGE, ValidateUtils.REGEX_IDPRODUCT));
         iProductService.deleteProduct(id);
 
 
@@ -190,7 +191,8 @@ public class ProductControl {
 
         int choice = ValidateUtils.getIntOfWithBounds(0, 6);
         switch (choice) {
-            case 0:sortProduct();
+            case 0:
+                sortProduct();
                 break;
             case 1:
                 comparator = Comparator.comparing(Product::getId).reversed();
@@ -229,7 +231,8 @@ public class ProductControl {
         System.out.println("╚═════════════════════════════════════════════╝");
         int choice = ValidateUtils.getIntOfWithBounds(0, 6);
         switch (choice) {
-            case 0:sortProduct();
+            case 0:
+                sortProduct();
                 break;
             case 1:
                 comparator = Comparator.comparing(Product::getId);
@@ -297,11 +300,12 @@ public class ProductControl {
         System.out.println("║                 2.Nước uống.                ║");
         System.out.println("║                                             ║");
         System.out.println("╚═════════════════════════════════════════════╝");
-        long choice = ValidateUtils.getIntOfWithBounds(1,2);
+        long choice = ValidateUtils.getIntOfWithBounds(1, 2);
         ECategory e = ECategory.findById(choice);
         List<Product> products1 = products.stream().filter(product -> product.getCategory().equals(e)).collect(Collectors.toList());
         return products1;
     }
+
     private List<Product> findProductbyName(List<Product> products) {
         String name = checkInputProductNameValidExist(ValidateUtils.FIELD_PRODUCTNAME, ValidateUtils.FIELD_PRODUCTNAME_MESSAGE, ValidateUtils.REGEX_PRODUCTNAME);
         List<Product> products1 = products.stream().filter(product -> product.getName().equals(name)).collect(Collectors.toList());
@@ -309,7 +313,7 @@ public class ProductControl {
     }
 
     private List<Product> findProductByID(List<Product> products) {
-        long id = Long.parseLong(checkInputIDProductValidExist(ValidateUtils.FIELD_IDPRODUCT,ValidateUtils.FIELD_IDPRODUCT_MESSAGE,ValidateUtils.REGEX_IDPRODUCT));
+        long id = Long.parseLong(checkInputIDProductValidExist(ValidateUtils.FIELD_IDPRODUCT, ValidateUtils.FIELD_IDPRODUCT_MESSAGE, ValidateUtils.REGEX_IDPRODUCT));
         List<Product> products1 = products.stream().filter(product -> product.getId() == id)
                 .collect(Collectors.toList());
         return products1;
@@ -350,6 +354,7 @@ public class ProductControl {
         } while (validateInput);
         return input;
     }
+
     private String checkInputProductNameValidExist(String fieldName, String fieldMessage, String fieldPattern) {
         String input = null;
         boolean validateInput = false;
@@ -391,13 +396,14 @@ public class ProductControl {
         }
         return check;
     }
+
     private String checkInputIDProductValidExist(String fieldName, String fieldMessage, String fieldPattern) {
         String input = null;
         boolean validateInput = false;
         do {
             System.out.printf("Nhập %s: \n", fieldName);
             input = scanner.nextLine();
-            if(!input.isEmpty()) {
+            if (!input.isEmpty()) {
                 if (!ValidateUtils.isValid(fieldPattern, input)) {
                     System.out.println(fieldMessage);
                     validateInput = true;
@@ -407,7 +413,9 @@ public class ProductControl {
                 } else {
                     validateInput = false;
                 }
-            }else{productControlView();}
+            } else {
+                    productControlView();
+            }
         } while (validateInput);
         return input;
     }

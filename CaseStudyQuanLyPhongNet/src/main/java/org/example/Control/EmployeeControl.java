@@ -82,7 +82,7 @@ public class EmployeeControl {
         for (User user : users1) {
             System.out.printf("║%7s ║ %20s ║ %13s ║ %15s ║ %6s ║ %13s║ %8s ║\n",
                     user.getId(), user.getName(), user.getUsername(), user.getIdentityCardId()
-                    , user.getAge(),DateUtils.formatDate(user.getDob()), user.getGender(), user.getRole());
+                    , user.getAge(), DateUtils.formatDate(user.getDob()), user.getGender(), user.getRole());
         }
         System.out.printf("╚════════════════════════════════════════════════════════════════════════════════════════════════════╝\n");
 
@@ -101,7 +101,7 @@ public class EmployeeControl {
         }
         System.out.printf("╚════════════════════════════════════════════════════════════════════════════════════════════════════╝\n");
 
-        }
+    }
 
 
     private void addEmployee() {
@@ -352,14 +352,19 @@ public class EmployeeControl {
         do {
             System.out.printf("Nhập %s: \n", fieldName);
             input = scanner.nextLine();
-            if (!ValidateUtils.isValid(fieldPattern, input)) {
-                System.out.println(fieldMessage);
-                validateInput = true;
-            } else if (ValidateUtils.isValid(fieldPattern, input) && !checkUser(input)) {
-                System.out.println("Không tìm thấy tên đăng nhập, vui lòng nhập lại");
-                validateInput = true;
-            } else if(ValidateUtils.isValid(fieldPattern, input) && checkUser(input)){
-                validateInput = false;}
+            if (!input.isEmpty()) {
+                if (!ValidateUtils.isValid(fieldPattern, input)) {
+                    System.out.println(fieldMessage);
+                    validateInput = true;
+                } else if (ValidateUtils.isValid(fieldPattern, input) && !checkUser(input)) {
+                    System.out.println("Không tìm thấy tên đăng nhập, vui lòng nhập lại");
+                    validateInput = true;
+                } else if (ValidateUtils.isValid(fieldPattern, input) && checkUser(input)) {
+                    validateInput = false;
+                }
+            } else {
+                employeeControlView();
+            }
 
 
         } while (validateInput);
@@ -392,14 +397,18 @@ public class EmployeeControl {
         do {
             System.out.printf("Nhập %s: \n", fieldName);
             input = scanner.nextLine();
-            if (!ValidateUtils.isValid(fieldPattern, input)) {
-                System.out.println(fieldMessage);
-                validateInput = true;
-            } else if (ValidateUtils.isValid(fieldPattern, input) && !checkPid(input)) {
-                System.out.println("Không tìm thấy mã căn cước, vui lòng nhập lại");
-                validateInput = true;
+            if (!input.isEmpty()) {
+                if (!ValidateUtils.isValid(fieldPattern, input)) {
+                    System.out.println(fieldMessage);
+                    validateInput = true;
+                } else if (ValidateUtils.isValid(fieldPattern, input) && !checkPid(input)) {
+                    System.out.println("Không tìm thấy mã căn cước, vui lòng nhập lại");
+                    validateInput = true;
+                } else {
+                    validateInput = false;
+                }
             } else {
-                validateInput = false;
+                employeeControlView();
             }
 
         } while (validateInput);
@@ -412,14 +421,18 @@ public class EmployeeControl {
         do {
             System.out.printf("Nhập %s: \n", fieldName);
             input = scanner.nextLine();
-            if (!ValidateUtils.isValid(fieldPattern, input)) {
-                System.out.println(fieldMessage);
-                validateInput = true;
-            } else if (ValidateUtils.isValid(fieldPattern, input) && !checkName(input)) {
-                System.out.println("Không tìm thấy họ tên, vui lòng nhập lại");
-                validateInput = true;
-            } else if (ValidateUtils.isValid(fieldPattern, input) && checkName(input)) {
-                validateInput = false;
+            if (!input.isEmpty()) {
+                if (!ValidateUtils.isValid(fieldPattern, input)) {
+                    System.out.println(fieldMessage);
+                    validateInput = true;
+                } else if (ValidateUtils.isValid(fieldPattern, input) && !checkName(input)) {
+                    System.out.println("Không tìm thấy họ tên, vui lòng nhập lại");
+                    validateInput = true;
+                } else if (ValidateUtils.isValid(fieldPattern, input) && checkName(input)) {
+                    validateInput = false;
+                }
+            } else {
+                employeeControlView();
             }
 
         } while (validateInput);
@@ -432,14 +445,18 @@ public class EmployeeControl {
         do {
             System.out.printf("Nhập %s: \n", fieldName);
             input = scanner.nextLine();
-            if (!ValidateUtils.isValid(fieldPattern, input)) {
-                System.out.println(fieldMessage);
-                validateInput = true;
-            } else if (ValidateUtils.isValid(fieldPattern, input) && !checkAge(input)) {
-                System.out.println("Không tìm thấy tuổi, vui lòng nhập lại ");
-                validateInput = true;
+            if (!input.isEmpty()) {
+                if (!ValidateUtils.isValid(fieldPattern, input)) {
+                    System.out.println(fieldMessage);
+                    validateInput = true;
+                } else if (ValidateUtils.isValid(fieldPattern, input) && !checkAge(input)) {
+                    System.out.println("Không tìm thấy tuổi, vui lòng nhập lại ");
+                    validateInput = true;
+                } else {
+                    validateInput = false;
+                }
             } else {
-                validateInput = false;
+                employeeControlView();
             }
 
         } while (validateInput);

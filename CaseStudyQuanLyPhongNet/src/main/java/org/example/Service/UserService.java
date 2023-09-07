@@ -107,6 +107,12 @@ public class UserService implements IUserService {
         FileUtils.writeData(fileUser,users);
     }
 
+    @Override
+    public boolean checkUserPassword(User user, String password) {
+
+        return PasswordUtils.isValid(password, user.getPassword());
+    }
+
     public static void main(String[] args) {
         UserService userService=new UserService();
         List<User> users= userService.getAllUsers();

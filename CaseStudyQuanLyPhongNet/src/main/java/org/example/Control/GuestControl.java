@@ -5,6 +5,7 @@ import org.example.Service.ITransactionHistory;
 import org.example.Service.IUserService;
 import org.example.Service.TransactionHistoryService;
 import org.example.Service.UserService;
+import org.example.Utils.AuthUtils;
 import org.example.Utils.DateUtils;
 import org.example.Utils.PasswordUtils;
 import org.example.Utils.ValidateUtils;
@@ -179,9 +180,9 @@ public class GuestControl {
     }
 
     private void addGuest() {
-        LocalDate date=LocalDate.now();
-        String date1=DateUtils.formatDate(date);
-        LocalDate dateCreate=DateUtils.parseDate(date1);
+        LocalDate date = LocalDate.now();
+        String date1 = DateUtils.formatDate(date);
+        LocalDate dateCreate = DateUtils.parseDate(date1);
         String name = checkInputValid(ValidateUtils.FIELD_FULLNAME, ValidateUtils.FIELD_FULLNAME_MESSAGE, ValidateUtils.REGEX_FULLNAME);
         long pid = Long.parseLong(checkInputValidPID(ValidateUtils.FIELD_PERSONALID, ValidateUtils.FIELD_PID_MESSAGE, ValidateUtils.REGEX_PERSONALID));
         String username = checkInputValidUser(ValidateUtils.FIELD_USER, ValidateUtils.FIELD_USER_MESSAGE, ValidateUtils.REGEX_USERNAME);
@@ -202,7 +203,7 @@ public class GuestControl {
         EGender gender = EGender.findById(idGender);
         User user = new User(System.currentTimeMillis() % 100000, name, username,
                 password, pid, age, dob, balance, gender, ERole.GUEST);
-        TransactionHistory transactionHistory= new TransactionHistory(System.currentTimeMillis() % 100000,username,LocalDate.now(),amountDeposit);
+        TransactionHistory transactionHistory = new TransactionHistory(System.currentTimeMillis() % 100000, username, LocalDate.now(), amountDeposit);
         iTransactionHistory.createTH(transactionHistory);
         iUserService.createUser(user);
     }
@@ -302,7 +303,7 @@ public class GuestControl {
         System.out.println("║                2.Giảm dân.                  ║");
         System.out.println("║                                             ║");
         System.out.println("╚═════════════════════════════════════════════╝");
-        int select = ValidateUtils.getIntOfWithBounds(1,2);
+        int select = ValidateUtils.getIntOfWithBounds(1, 2);
         List<User> users = iUserService.getAllUsers();
         List<User> users1 = users.stream().filter(user -> user.getRole().equals(ERole.GUEST))
                 .collect(Collectors.toList());
@@ -338,7 +339,8 @@ public class GuestControl {
         System.out.println("╚═════════════════════════════════════════════╝");
         int choice = ValidateUtils.getIntOfWithBounds(0, 6);
         switch (choice) {
-            case 0:sortGuest();
+            case 0:
+                sortGuest();
                 break;
             case 1:
                 comparator = Comparator.comparing(User::getId).reversed();
@@ -378,7 +380,8 @@ public class GuestControl {
         System.out.println("╚═════════════════════════════════════════════╝");
         int choice = ValidateUtils.getIntOfWithBounds(0, 6);
         switch (choice) {
-            case 0:sortGuest();
+            case 0:
+                sortGuest();
                 break;
             case 1:
                 comparator = Comparator.comparing(User::getId);
@@ -407,7 +410,7 @@ public class GuestControl {
         showGuest();
 
         String username = checkInputValidUserExist(ValidateUtils.FIELD_USER, ValidateUtils.FIELD_USER_MESSAGE, ValidateUtils.REGEX_USERNAME);
-        long deposit = Long.parseLong(checkInputValid(ValidateUtils.FIELD_DEPOSIT,ValidateUtils.FIELD_BALANCE_MESSAGE,ValidateUtils.REGEX_BALANCE));
+        long deposit = Long.parseLong(checkInputValid(ValidateUtils.FIELD_DEPOSIT, ValidateUtils.FIELD_BALANCE_MESSAGE, ValidateUtils.REGEX_BALANCE));
         long balance = (long) (deposit * BonusInterest);
         List<User> users = iUserService.getAllUsers();
         List<User> users1 = users.stream().filter(user -> user.getRole().equals(ERole.GUEST))
@@ -415,8 +418,8 @@ public class GuestControl {
         User userResult = users1.stream().filter(user -> user.getUsername().equals(username)).findFirst().get();
         userResult.setBalance(userResult.getBalance() + balance);
         System.out.println("Nạp tiền thành công");
-        iUserService.updateBalance(userResult.getBalance(),userResult);
-        TransactionHistory transactionHistory= new TransactionHistory(System.currentTimeMillis() % 100000,userResult.getUsername(),LocalDate.now(),deposit);
+        iUserService.updateBalance(userResult.getBalance(), userResult);
+        TransactionHistory transactionHistory = new TransactionHistory(System.currentTimeMillis() % 100000, userResult.getUsername(), LocalDate.now(), deposit);
         iTransactionHistory.createTH(transactionHistory);
 
 
@@ -480,14 +483,22 @@ public class GuestControl {
             List<User> users = iUserService.getAllUsers();
             System.out.printf("Nhập %s: \n", fieldName);
             input = scanner.nextLine();
-            if (!ValidateUtils.isValid(fieldPattern, input)) {
-                System.out.println(fieldMessage);
-                validateInput = true;
-            } else if (ValidateUtils.isValid(fieldPattern, input) && !checkUser(input)) {
-                System.out.println("Không tìm thấy tên đăng nhập, vui lòng nhập lại");
-                validateInput = true;
+            if (!input.isEmpty()) {
+                if (!ValidateUtils.isValid(fieldPattern, input)) {
+                    System.out.println(fieldMessage);
+                    validateInput = true;
+                } else if (ValidateUtils.isValid(fieldPattern, input) && !checkUser(input)) {
+                    System.out.println("Không tìm thấy tên đăng nhập, vui lòng nhập lại");
+                    validateInput = true;
+                } else {
+                    validateInput = false;
+                }
             } else {
-                validateInput = false;
+                if (AuthUtils.getUser().getRole().equals(ERole.ADMIN)) {
+                    guestControlView();
+                } else if (AuthUtils.getUser().getRole().equals(ERole.EMPLOYEE)) {
+                    guestControlViewByEmployee();
+                }
             }
 
         } while (validateInput);
@@ -501,16 +512,23 @@ public class GuestControl {
             List<User> users = iUserService.getAllUsers();
             System.out.printf("Nhập %s: \n", fieldName);
             input = scanner.nextLine();
-            if (!ValidateUtils.isValid(fieldPattern, input)) {
-                System.out.println(fieldMessage);
-                validateInput = true;
-            } else if (ValidateUtils.isValid(fieldPattern, input) && checkPid(input)) {
-                System.out.println("Mã căn cước đã tồn tại, vui lòng nhập lại");
-                validateInput = true;
+            if (!input.isEmpty()) {
+                if (!ValidateUtils.isValid(fieldPattern, input)) {
+                    System.out.println(fieldMessage);
+                    validateInput = true;
+                } else if (ValidateUtils.isValid(fieldPattern, input) && checkPid(input)) {
+                    System.out.println("Mã căn cước đã tồn tại, vui lòng nhập lại");
+                    validateInput = true;
+                } else {
+                    validateInput = false;
+                }
             } else {
-                validateInput = false;
+                if (AuthUtils.getUser().getRole().equals(ERole.ADMIN)) {
+                    guestControlView();
+                } else if (AuthUtils.getUser().getRole().equals(ERole.EMPLOYEE)) {
+                    guestControlViewByEmployee();
+                }
             }
-
         } while (validateInput);
         return input;
     }
@@ -522,16 +540,23 @@ public class GuestControl {
             List<User> users = iUserService.getAllUsers();
             System.out.printf("Nhập %s: \n", fieldName);
             input = scanner.nextLine();
-            if (!ValidateUtils.isValid(fieldPattern, input)) {
-                System.out.println(fieldMessage);
-                validateInput = true;
-            } else if (ValidateUtils.isValid(fieldPattern, input) && !checkPid(input)) {
-                System.out.println("Không tìm thấy mã căn cước, vui lòng nhập lại");
-                validateInput = true;
+            if (!input.isEmpty()) {
+                if (!ValidateUtils.isValid(fieldPattern, input)) {
+                    System.out.println(fieldMessage);
+                    validateInput = true;
+                } else if (ValidateUtils.isValid(fieldPattern, input) && !checkPid(input)) {
+                    System.out.println("Không tìm thấy mã căn cước, vui lòng nhập lại");
+                    validateInput = true;
+                } else {
+                    validateInput = false;
+                }
             } else {
-                validateInput = false;
+                if (AuthUtils.getUser().getRole().equals(ERole.ADMIN)) {
+                    guestControlView();
+                } else if (AuthUtils.getUser().getRole().equals(ERole.EMPLOYEE)) {
+                    guestControlViewByEmployee();
+                }
             }
-
         } while (validateInput);
         return input;
     }
@@ -543,40 +568,29 @@ public class GuestControl {
             List<User> users = iUserService.getAllUsers();
             System.out.printf("Nhập %s: \n", fieldName);
             input = scanner.nextLine();
-            if (!ValidateUtils.isValid(fieldPattern, input)) {
-                System.out.println(fieldMessage);
-                validateInput = true;
-            } else if (ValidateUtils.isValid(fieldPattern, input) && !checkName(input)) {
-                System.out.println("Không tìm thấy họ tên, vui lòng nhập lại");
-                validateInput = true;
+            if (!input.isEmpty()) {
+                if (!ValidateUtils.isValid(fieldPattern, input)) {
+                    System.out.println(fieldMessage);
+                    validateInput = true;
+                } else if (ValidateUtils.isValid(fieldPattern, input) && !checkName(input)) {
+                    System.out.println("Không tìm thấy họ tên, vui lòng nhập lại");
+                    validateInput = true;
+                } else {
+                    validateInput = false;
+                }
             } else {
-                validateInput = false;
+                if (AuthUtils.getUser().getRole().equals(ERole.ADMIN)) {
+                    guestControlView();
+                } else if (AuthUtils.getUser().getRole().equals(ERole.EMPLOYEE)) {
+                    guestControlViewByEmployee();
+                }
             }
+
 
         } while (validateInput);
         return input;
     }
 
-    private String checkInputValidAgeExist(String fieldName, String fieldMessage, String fieldPattern) {
-        String input = null;
-        boolean validateInput = false;
-        do {
-            List<User> users = iUserService.getAllUsers();
-            System.out.printf("Nhập %s: \n", fieldName);
-            input = scanner.nextLine();
-            if (!ValidateUtils.isValid(fieldPattern, input)) {
-                System.out.println(fieldMessage);
-                validateInput = true;
-            } else if (ValidateUtils.isValid(fieldPattern, input) && !checkAge(input)) {
-                System.out.println("Không tìm thấy tuổi, vui lòng nhập lại ");
-                validateInput = true;
-            } else {
-                validateInput = false;
-            }
-
-        } while (validateInput);
-        return input;
-    }
 
     private boolean checkUser(String userName) {
         List<User> users = iUserService.getAllUsers();

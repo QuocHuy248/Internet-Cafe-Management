@@ -5,6 +5,7 @@ import org.example.Control.OrderControl;
 import org.example.Control.ProductControl;
 import org.example.Service.*;
 import org.example.Utils.AuthUtils;
+import org.example.Utils.PasswordUtils;
 import org.example.Utils.TimeUtils;
 import org.example.Utils.ValidateUtils;
 import org.example.model.*;
@@ -84,7 +85,7 @@ public class UserView {
                 System.out.println("║            2. Không.                        ║");
                 System.out.println("║                                             ║");
                 System.out.println("╚═════════════════════════════════════════════╝");
-                int action = ValidateUtils.getIntOfWithBounds(1,2);
+                int action = ValidateUtils.getIntOfWithBounds(1, 2);
                 switch (action) {
                     case 1:
                         userLauncher();
@@ -116,7 +117,7 @@ public class UserView {
         System.out.println("║                                             ║");
         System.out.println("║                                             ║");
         System.out.println("╚═════════════════════════════════════════════╝");
-        int act = ValidateUtils.getIntOfWithBounds(0,2);
+        int act = ValidateUtils.getIntOfWithBounds(0, 2);
         switch (act) {
             case 0:
                 iComputerService.updateComputerStatusFromInUsetoReady(AuthUtils.getComputer());
@@ -141,13 +142,55 @@ public class UserView {
 
 
     private void updatePassword() {
-        System.out.println("Nhập mật khẩu mới:");
-        String password = scanner.nextLine();
-        iUserService.updatePassword(AuthUtils.getUser(), password);
+        String password1 = checkInputPassWordValid(ValidateUtils.FIELD_PASSWORD, ValidateUtils.FIELD_PASSWORD_MESSAGE, ValidateUtils.REGEX_PASSWORD);
+        if (iUserService.checkUserPassword(AuthUtils.getUser(), password1)) {
+            String password = checkInputPassWordValid(ValidateUtils.FIELD_PASSWORDNEW, ValidateUtils.FIELD_PASSWORD_MESSAGE, ValidateUtils.REGEX_PASSWORD);
+            System.out.println("Bạn có muốn đổi mật khẩu không");
+            System.out.println("1.Có");
+            System.out.println("2.Không");
+            int choice = ValidateUtils.getIntOfWithBounds(1, 2);
+            switch (choice) {
+                case 1:
+                    String newPassword = PasswordUtils.generatePassword(password);
+                    iUserService.updatePassword(AuthUtils.getUser(), newPassword);
+                    break;
+                case 2:
+                    userViewLauncher();
+                    break;
+            }
+        } else {
+            System.out.println("Mật khẩu không chính xác, bạn có muốn tiếp tục?");
+            System.out.println("1.Có");
+            System.out.println("2.Không");
+            int choice = ValidateUtils.getIntOfWithBounds(1, 2);
+            switch (choice) {
+                case 1:
+                    updatePassword();
+                    break;
+                case 2:
+                    userViewLauncher();
+                    break;
+            }
+        }
+
         System.out.println("Đổi mật khẩu thành công");
 
     }
-
+    private String checkInputPassWordValid(String fieldName, String fieldMessage, String fieldPattern) {
+        String input = null;
+        boolean validateInput = false;
+        do {
+            System.out.printf("Nhập %s: \n", fieldName);
+            input = scanner.nextLine();
+            if (!ValidateUtils.isValid(fieldPattern, input)) {         // Nếu SAI
+                System.out.println(fieldMessage);
+                validateInput = true;
+            } else {
+                validateInput = false;
+            }
+        } while (validateInput);
+        return input;
+    }
 
     private String checkInputValid(String fieldName, String fieldMessage, String fieldPattern) {
         String input = null;
@@ -216,9 +259,9 @@ public class UserView {
         System.out.printf("║  Tên người chơi         ║ %-20s║\n", AuthUtils.getUser().getUsername());
         System.out.printf("╚═══════════════════════════════════════════════╝\n");
         System.out.printf("╔═══════════════════════════════════════════════╗\n");
-        System.out.printf("║  Thời gian đã sử dụng   ║ %-20s║\n", minute+" phút");
-        System.out.printf("║  Thời gian còn lại      ║ %-20s║\n", timePlayOfUser+" phút");
-        System.out.printf("║  Số dư tài khoản        ║ %-20s║\n", user.getBalance()+" đồng");
+        System.out.printf("║  Thời gian đã sử dụng   ║ %-20s║\n", minute + " phút");
+        System.out.printf("║  Thời gian còn lại      ║ %-20s║\n", timePlayOfUser + " phút");
+        System.out.printf("║  Số dư tài khoản        ║ %-20s║\n", user.getBalance() + " đồng");
         System.out.printf("╚═══════════════════════════════════════════════╝\n");
         iUserService.updateBalance(user.getBalance(), user);
     }

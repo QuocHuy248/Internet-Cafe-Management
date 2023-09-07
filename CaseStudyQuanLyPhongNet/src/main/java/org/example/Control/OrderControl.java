@@ -1,15 +1,13 @@
 package org.example.Control;
 
 import org.example.Service.*;
+import org.example.Utils.AuthUtils;
 import org.example.Utils.DateUtils;
 import org.example.Utils.ValidateUtils;
 import org.example.Views.AdminView;
 import org.example.Views.EmployeeView;
 import org.example.Views.UserView;
-import org.example.model.Order;
-import org.example.model.OrderItem;
-import org.example.model.Product;
-import org.example.model.User;
+import org.example.model.*;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
@@ -149,17 +147,17 @@ public class OrderControl {
         Order order = new Order();
         order.setId(System.currentTimeMillis() % 100000);
         boolean checkContinueOrderItem = false;
-        ProductControl productControl= new ProductControl();
+        ProductControl productControl = new ProductControl();
         productControl.showProduct();
         do {
             Product p = null;
-            long idProduct=0;
+            long idProduct = 0;
             do {
                 idProduct = Long.parseLong(checkInputValidIdProductExist(ValidateUtils.FIELD_IDPRODUCT, ValidateUtils.FIELD_IDPRODUCT_MESSAGE, ValidateUtils.REGEX_IDPRODUCT));
                 p = iProductService.findProduct(idProduct);
             }
             while (!checkQuantityExist(p));
-            int quantity = Integer.parseInt(checkInputValidProductQuantityExist(ValidateUtils.FIELD_PRODUCTQUANTITY,ValidateUtils.FIELD_QUANTITYP_MESSAGE,ValidateUtils.REGEX_QUANTITYPRODUCT,p));
+            int quantity = Integer.parseInt(checkInputValidProductQuantityExist(ValidateUtils.FIELD_PRODUCTQUANTITY, ValidateUtils.FIELD_QUANTITYP_MESSAGE, ValidateUtils.REGEX_QUANTITYPRODUCT, p));
             if (order.getOrderItems() == null) {
                 List<OrderItem> orderItems = new ArrayList<>();
                 OrderItem orderItem = new OrderItem(System.currentTimeMillis() % 100000,
@@ -181,7 +179,7 @@ public class OrderControl {
                 }
             }
             System.out.println("Bạn có muốn thêm tiếp sản phẩm không: Y/N");
-            String actionContinueOrderItem = checkInputValid(ValidateUtils.FIELD_ACTIONCONTINUE,ValidateUtils.FIELD_ACTIONCONTINUE_MESSAGE,ValidateUtils.REGEX_ACTIONCONTINUE);
+            String actionContinueOrderItem = checkInputValid(ValidateUtils.FIELD_ACTIONCONTINUE, ValidateUtils.FIELD_ACTIONCONTINUE_MESSAGE, ValidateUtils.REGEX_ACTIONCONTINUE);
             switch (actionContinueOrderItem) {
                 case "Y":
                     checkContinueOrderItem = true;
@@ -206,13 +204,13 @@ public class OrderControl {
         boolean checkContinueOrderItem = false;
         do {
             Product p = null;
-            long idProduct=0;
+            long idProduct = 0;
             do {
                 idProduct = Long.parseLong(checkInputValidIdProductExist(ValidateUtils.FIELD_IDPRODUCT, ValidateUtils.FIELD_IDPRODUCT_MESSAGE, ValidateUtils.REGEX_IDPRODUCT));
                 p = iProductService.findProduct(idProduct);
             }
             while (!checkQuantityExist(p));
-            int quantity = Integer.parseInt(checkInputValidProductQuantityExist(ValidateUtils.FIELD_PRODUCTQUANTITY,ValidateUtils.FIELD_QUANTITYP_MESSAGE,ValidateUtils.REGEX_QUANTITYPRODUCT,p));
+            int quantity = Integer.parseInt(checkInputValidProductQuantityExist(ValidateUtils.FIELD_PRODUCTQUANTITY, ValidateUtils.FIELD_QUANTITYP_MESSAGE, ValidateUtils.REGEX_QUANTITYPRODUCT, p));
             if (order.getOrderItems() == null) {
                 List<OrderItem> orderItems = new ArrayList<>();
                 OrderItem orderItem = new OrderItem(System.currentTimeMillis() % 100000,
@@ -234,7 +232,7 @@ public class OrderControl {
                 }
             }
             System.out.println("Bạn có muốn thêm tiếp sản phẩm không: Y/N");
-            String actionContinueOrderItem = checkInputValid(ValidateUtils.FIELD_ACTIONCONTINUE,ValidateUtils.FIELD_ACTIONCONTINUE_MESSAGE,ValidateUtils.REGEX_ACTIONCONTINUE);
+            String actionContinueOrderItem = checkInputValid(ValidateUtils.FIELD_ACTIONCONTINUE, ValidateUtils.FIELD_ACTIONCONTINUE_MESSAGE, ValidateUtils.REGEX_ACTIONCONTINUE);
             switch (actionContinueOrderItem) {
                 case "Y":
                     checkContinueOrderItem = true;
@@ -270,7 +268,7 @@ public class OrderControl {
         System.out.println("║                 2. Không.                   ║");
         System.out.println("║                                             ║");
         System.out.println("╚═════════════════════════════════════════════╝");
-        int act = ValidateUtils.getIntOfWithBounds(1,2);
+        int act = ValidateUtils.getIntOfWithBounds(1, 2);
         switch (act) {
             case 1:
                 iOrderService.createOrder(order);
@@ -333,9 +331,10 @@ public class OrderControl {
         System.out.println("║                 4.Giá trị hóa đơn.          ║");
         System.out.println("║                                             ║");
         System.out.println("╚═════════════════════════════════════════════╝");
-        int choice = ValidateUtils.getIntOfWithBounds(0,4);
+        int choice = ValidateUtils.getIntOfWithBounds(0, 4);
         switch (choice) {
-            case 0:sortOder();
+            case 0:
+                sortOder();
                 break;
             case 1:
                 comparator = Comparator.comparing(Order::getId).reversed();
@@ -364,9 +363,10 @@ public class OrderControl {
         System.out.println("║                 4.Giá trị hóa đơn.          ║");
         System.out.println("║                                             ║");
         System.out.println("╚═════════════════════════════════════════════╝");
-        int choice = ValidateUtils.getIntOfWithBounds(0,4);
+        int choice = ValidateUtils.getIntOfWithBounds(0, 4);
         switch (choice) {
-            case 0:sortOder();
+            case 0:
+                sortOder();
                 break;
             case 1:
                 comparator = Comparator.comparing(Order::getId);
@@ -393,7 +393,7 @@ public class OrderControl {
         System.out.println("║                 2.Tên người đặt hàng.       ║");
         System.out.println("║                                             ║");
         System.out.println("╚═════════════════════════════════════════════╝");
-        int action = ValidateUtils.getIntOfWithBounds(1,2);
+        int action = ValidateUtils.getIntOfWithBounds(1, 2);
         List<Order> orders = iOrderService.getAllOrders();
         List<Order> orderResult = null;
         switch (action) {
@@ -403,22 +403,24 @@ public class OrderControl {
             case 2:
                 orderResult = findOrderByUserName(orders);
                 break;
-        }showOrder(orderResult);
+        }
+        showOrder(orderResult);
 
     }
 
     private List<Order> findOrderByID(List<Order> orders) {
 
-        long id = Long.parseLong(checkInputValidIdOExist(ValidateUtils.FIELD_ORDERID,ValidateUtils.FIELD_IDORDER_MESSAGE, ValidateUtils.REGEX_ORDERID));
+        long id = Long.parseLong(checkInputValidIdOExist(ValidateUtils.FIELD_ORDERID, ValidateUtils.FIELD_IDORDER_MESSAGE, ValidateUtils.REGEX_ORDERID));
         List<Order> resultOrder = orders.stream().filter(order -> order.getId() == id).collect(Collectors.toList());
         return resultOrder;
     }
 
     private List<Order> findOrderByUserName(List<Order> orders) {
-        String name = checkInputValidUserNameOExist(ValidateUtils.FIELD_USER,ValidateUtils.FIELD_USER_MESSAGE,ValidateUtils.REGEX_USERNAME);
-        List<Order> resultOrder = orders.stream().filter(order -> order.getUsername().equals( name)).collect(Collectors.toList());
+        String name = checkInputValidUserNameOExist(ValidateUtils.FIELD_USER, ValidateUtils.FIELD_USER_MESSAGE, ValidateUtils.REGEX_USERNAME);
+        List<Order> resultOrder = orders.stream().filter(order -> order.getUsername().equals(name)).collect(Collectors.toList());
         return resultOrder;
     }
+
     public static void main(String[] args) {
         OrderControl orderControl = new OrderControl();
         orderControl.showOrder();
@@ -449,6 +451,7 @@ public class OrderControl {
         }
         return false;
     }
+
     private boolean checkUserNameOrder(String userName) {
         List<Order> orders = iOrderService.getAllOrders();
         for (Order o : orders) {
@@ -468,20 +471,29 @@ public class OrderControl {
         }
         return false;
     }
+
     private String checkInputValidUserNameOExist(String fieldName, String fieldMessage, String fieldPattern) {
         String input = null;
         boolean validateInput = false;
         do {
             System.out.printf("Nhập %s: \n", fieldName);
             input = scanner.nextLine();
-            if (!ValidateUtils.isValid(fieldPattern, input)) {
-                System.out.println(fieldMessage);
-                validateInput = true;
-            } else if (ValidateUtils.isValid(fieldPattern, input) && !checkUserNameOrder(input)) {
-                System.out.println("Không tìm thấy username trong danh sách order, vui lòng nhập lại");
-                validateInput = true;
+            if (!input.isEmpty()) {
+                if (!ValidateUtils.isValid(fieldPattern, input)) {
+                    System.out.println(fieldMessage);
+                    validateInput = true;
+                } else if (ValidateUtils.isValid(fieldPattern, input) && !checkUserNameOrder(input)) {
+                    System.out.println("Không tìm thấy username trong danh sách order, vui lòng nhập lại");
+                    validateInput = true;
+                } else {
+                    validateInput = false;
+                }
             } else {
-                validateInput = false;
+                if (AuthUtils.getUser().getRole().equals(ERole.ADMIN)) {
+                    orderControlView();
+                } else if (AuthUtils.getUser().getRole().equals(ERole.EMPLOYEE)) {
+                    orderControlViewByEmployee();
+                }
             }
 
         } while (validateInput);
@@ -494,17 +506,23 @@ public class OrderControl {
         do {
             System.out.printf("Nhập %s: \n", fieldName);
             input = scanner.nextLine();
-
-            if (!ValidateUtils.isValid(fieldPattern, input)) {
-                System.out.println(fieldMessage);
-                validateInput = true;
-            } else if (ValidateUtils.isValid(fieldPattern, input) && !checkIDOrder(input)) {
-                System.out.println("Không tìm thấy id của Order, vui lòng nhập lại id");
-                validateInput = true;
+            if (!input.isEmpty()) {
+                if (!ValidateUtils.isValid(fieldPattern, input)) {
+                    System.out.println(fieldMessage);
+                    validateInput = true;
+                } else if (ValidateUtils.isValid(fieldPattern, input) && !checkIDOrder(input)) {
+                    System.out.println("Không tìm thấy id của Order, vui lòng nhập lại id");
+                    validateInput = true;
+                } else {
+                    validateInput = false;
+                }
             } else {
-                validateInput = false;
+                if (AuthUtils.getUser().getRole().equals(ERole.ADMIN)) {
+                    orderControlView();
+                } else if (AuthUtils.getUser().getRole().equals(ERole.EMPLOYEE)) {
+                    orderControlViewByEmployee();
+                }
             }
-
         } while (validateInput);
         return input;
     }
@@ -538,7 +556,7 @@ public class OrderControl {
             if (!ValidateUtils.isValid(fieldPattern, input)) {
                 System.out.println(fieldMessage);
                 validateInput = true;
-            } else if (ValidateUtils.isValid(fieldPattern, input) && !checkQuantity(product,input)) {
+            } else if (ValidateUtils.isValid(fieldPattern, input) && !checkQuantity(product, input)) {
                 System.out.println("Số lượng sản phẩm bạn đặt lớn hơn số lượng sản phẩm hiện có, vui lòng chọn lại số lượng sản phẩm");
                 validateInput = true;
             } else {
@@ -553,7 +571,7 @@ public class OrderControl {
         boolean check = false;
         long quantity = Long.parseLong(input);
 
-       if (quantity > product.getQuantity()) {
+        if (quantity > product.getQuantity()) {
             check = false;
         } else if (quantity <= product.getQuantity()) {
             check = true;
@@ -571,9 +589,11 @@ public class OrderControl {
         }
 
         return check;
-    }private  void updateProductQuantity(Order order){
-        List<OrderItem>orderItems= order.getOrderItems();
-        orderItems.stream().forEach(orderItem ->iProductService.updateQuantity(orderItem.getQuantity(),orderItem.getIdProduct()));
+    }
+
+    private void updateProductQuantity(Order order) {
+        List<OrderItem> orderItems = order.getOrderItems();
+        orderItems.stream().forEach(orderItem -> iProductService.updateQuantity(orderItem.getQuantity(), orderItem.getIdProduct()));
     }
 
 

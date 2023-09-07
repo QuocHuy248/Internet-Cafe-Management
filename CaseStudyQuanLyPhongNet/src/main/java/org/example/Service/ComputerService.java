@@ -113,10 +113,9 @@ public class ComputerService implements IComputerService {
     @Override
     public void updateComputerStatusFromInUsetoReady(Computer computer) {
         List<Computer> computers = getAllComputer();
-        Computer computer1 = computers.stream().filter(computer2 -> computer2.getName().equals(computer.getName())).findFirst().get();
-        computer1.setStatusComputer(EStatusComputer.Ready);
-        computer1.setUsername(computer1.getName());
-        computer1.setStartUsing(TimeUtils.parseTime("00:00"));
+        computers.stream().filter(computer2 -> computer2.getName().equals(computer.getName())).findFirst().get().setStatusComputer(EStatusComputer.Ready);
+        computers.stream().filter(computer2 -> computer2.getName().equals(computer.getName())).findFirst().get().setUsername(computer.getName());
+        computers.stream().filter(computer2 -> computer2.getName().equals(computer.getName())).findFirst().get().setStartUsing(TimeUtils.parseTime("00:00"));
         FileUtils.writeData(fileComputer, computers);
     }
 
